@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StudyStream - 게시글 작성</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <a class="logo-wrap logo-link" href="/posts">
+            <div class="logo-icon">▶</div>
+            <div class="logo-text-group">
+                <h1 class="logo">StudyStream</h1>
+                <p class="logo-sub">Learn • Share • Stream</p>
+            </div>
+        </a>
+
+        <nav class="nav">
+            <div class="nav-left">
+                <a href="/posts">게시글 목록</a>
+                <a class="active" href="/posts/write">자료 업로드</a>
+            </div>
+
+            <div class="nav-right">
+                <span th:if="${username != null}">
+                    <strong th:text="${username}"></strong>님 환영합니다.
+                    <a href="/logout">로그아웃</a>
+                </span>
+
+                <span th:if="${username == null}">
+                    <a href="/login">로그인</a>
+                    <a href="/signup">회원가입</a>
+                </span>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="main">
+    <section class="card form-card">
+        <div class="card-heading">
+            <div>
+                <h2 class="card-title">학습자료 게시글 작성</h2>
+                <p class="page-desc">내 컴퓨터에 있는 오디오, 비디오, 문서 파일을 선택해서 업로드합니다.</p>
+            </div>
+            <span class="hero-badge">Upload</span>
+        </div>
+
+        <div class="error-message" th:if="${errorMessage != null}" th:text="${errorMessage}">
+            파일 업로드 오류 메시지
+        </div>
+
+        <form action="/posts/write" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>제목</label>
+                <input type="text" name="title" placeholder="예: 운영체제 강의 녹음 자료" th:value="${title}" required>
+            </div>
+
+            <div class="form-group">
+                <label>카테고리</label>
+                <select name="category" required>
+                    <option value="강의녹음" th:selected="${category == '강의녹음'}">강의녹음</option>
+                    <option value="실습영상" th:selected="${category == '실습영상'}">실습영상</option>
+                    <option value="발표영상" th:selected="${category == '발표영상'}">발표영상</option>
+                    <option value="학습자료" th:selected="${category == '학습자료'}">학습자료</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>미디어 파일 업로드</label>
+                <div class="upload-box">
+                    <input type="file" name="mediaFiles" multiple accept="audio/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.md,.html,.htm">
+                    <p class="form-note">mp3, mp4, pdf, docx, pptx, html 등 학습자료 파일을 여러 개 선택할 수 있습니다.</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>내용</label>
+                <textarea name="content" placeholder="학습자료 설명을 입력하세요." th:text="${content}" required></textarea>
+            </div>
+
+            <div class="btn-area">
+                <button class="btn btn-primary" type="submit">등록하기</button>
+                <a class="btn btn-gray" href="/posts">목록으로</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+</body>
+</html>

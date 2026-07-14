@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StudyStream - 학습자료 보기</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <a class="logo-wrap logo-link" href="/posts">
+            <div class="logo-icon">▶</div>
+            <div class="logo-text-group">
+                <h1 class="logo">StudyStream</h1>
+                <p class="logo-sub">Learn • Share • Stream</p>
+            </div>
+        </a>
+
+        <nav class="nav">
+            <div class="nav-left">
+                <a href="/posts">게시글 목록</a>
+                <a href="/posts/write">자료 업로드</a>
+            </div>
+
+            <div class="nav-right">
+                <span th:if="${username != null}">
+                    <strong th:text="${username}"></strong>님 환영합니다.
+                    <a href="/logout">로그아웃</a>
+                </span>
+
+                <span th:if="${username == null}">
+                    <a href="/login">로그인</a>
+                    <a href="/signup">회원가입</a>
+                </span>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="main">
+    <section class="card">
+        <div class="card-heading">
+            <div>
+                <span class="badge" th:text="${post.category}">카테고리</span>
+                <h2 class="card-title detail-title" th:text="${post.title}">게시글 제목</h2>
+                <p class="page-desc">등록된 오디오, 비디오, 문서 학습자료를 확인합니다.</p>
+            </div>
+            <span class="hero-badge">Study File</span>
+        </div>
+
+        <div class="detail-content" th:text="${post.content}">게시글 내용</div>
+
+        <div th:if="${mediaList == null or mediaList.size() == 0}" class="empty-message empty-card">
+            연결된 학습자료 파일이 없습니다.
+        </div>
+
+        <div th:each="media : ${mediaList}" class="media-box media-player-card">
+            <div th:if="${media.mediaType == 'audio'}">
+                <h3 class="section-title">오디오 학습자료</h3>
+                <p class="media-file-name" th:text="${media.fileName}">파일명</p>
+
+                <audio controls>
+                    <source th:src="@{${media.filePath}}" th:type="${media.contentType}">
+                    브라우저가 오디오 태그를 지원하지 않습니다.
+                </audio>
+            </div>
+
+            <div th:if="${media.mediaType == 'video'}">
+                <h3 class="section-title">비디오 학습자료</h3>
+                <p class="media-file-name" th:text="${media.fileName}">파일명</p>
+
+                <video controls>
+                    <source th:src="@{${media.filePath}}" th:type="${media.contentType}">
+                    브라우저가 비디오 태그를 지원하지 않습니다.
+                </video>
+            </div>
+
+            <div th:if="${media.mediaType == 'document' or media.mediaType == 'html'}" class="file-download-card">
+                <h3 class="section-title">문서 학습자료</h3>
+                <p class="media-file-name" th:text="${media.fileName}">파일명</p>
+                <p class="form-note">PDF, Word, HTML 문서 파일은 다운로드해서 확인할 수 있습니다.</p>
+
+                <div class="btn-area small-btn-area">
+                    <a class="btn btn-primary" th:href="@{/media-play/download/{id}(id=${media.mediaId})}">파일 다운로드</a>
+                    <a class="btn btn-gray" th:if="${media.contentType == 'application/pdf'}" th:href="@{${media.filePath}}" target="_blank">PDF 미리보기</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-area">
+            <a class="btn btn-gray" th:href="@{/posts/{id}(id=${post.postId})}">게시글로 돌아가기</a>
+            <a class="btn btn-primary" href="/posts">목록으로</a>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

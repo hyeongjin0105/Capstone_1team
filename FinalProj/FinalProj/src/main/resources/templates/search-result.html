@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StudyStream - 검색 결과</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <a class="logo-wrap logo-link" href="/posts">
+            <div class="logo-icon">▶</div>
+            <div class="logo-text-group">
+                <h1 class="logo">StudyStream</h1>
+                <p class="logo-sub">Learn • Share • Stream</p>
+            </div>
+        </a>
+
+        <nav class="nav">
+            <div class="nav-left">
+                <a href="/posts">게시글 목록</a>
+                <a href="/posts/write">자료 업로드</a>
+            </div>
+
+            <div class="nav-right">
+                <span th:if="${username != null}">
+                    <strong th:text="${username}"></strong>님 환영합니다.
+                    <a href="/logout">로그아웃</a>
+                </span>
+
+                <span th:if="${username == null}">
+                    <a href="/login">로그인</a>
+                    <a href="/signup">회원가입</a>
+                </span>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="main">
+    <section class="card">
+        <h2 class="card-title">검색 결과</h2>
+
+        <p class="page-desc">
+            검색어: <strong th:text="${keyword}"></strong>
+        </p>
+
+        <form class="search-area" action="/search" method="get">
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="제목 또는 내용을 검색하세요">
+            <button type="submit">검색</button>
+        </form>
+
+        <div class="action-bar">
+            <a class="write-btn" href="/posts/write">+ 게시글 작성</a>
+            <span class="post-count">
+                총 <strong th:text="${postRows.size()}"></strong>개의 검색 결과
+            </span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>카테고리</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>작성일</th>
+                    <th>수정일</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="row : ${postRows}">
+                    <td th:text="${row.post.postId}"></td>
+                    <td>
+                        <span class="badge" th:text="${row.post.category}"></span>
+                    </td>
+                    <td>
+                        <a class="post-title"
+                           th:href="@{/posts/{id}(id=${row.post.postId})}"
+                           th:text="${row.post.title}"></a>
+                    </td>
+                    <td th:text="${row.writerName}"></td>
+                    <td th:text="${#temporals.format(row.post.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <span th:if="${row.post.updatedAt != null}"
+                              th:text="${#temporals.format(row.post.updatedAt, 'yyyy-MM-dd HH:mm')}"></span>
+                        <span th:if="${row.post.updatedAt == null}">-</span>
+                    </td>
+                </tr>
+
+                <tr th:if="${postRows.size() == 0}">
+                    <td colspan="6" class="empty-message">검색 결과가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="btn-area">
+            <a class="btn btn-gray" href="/posts">게시글 목록으로 돌아가기</a>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StudyStream - 게시글 상세</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <a class="logo-wrap logo-link" href="/posts">
+            <div class="logo-icon">▶</div>
+            <div class="logo-text-group">
+                <h1 class="logo">StudyStream</h1>
+                <p class="logo-sub">Learn • Share • Stream</p>
+            </div>
+        </a>
+
+        <nav class="nav">
+            <div class="nav-left">
+                <a href="/posts">게시글 목록</a>
+                <a href="/posts/write">자료 업로드</a>
+            </div>
+
+            <div class="nav-right">
+                <span th:if="${username != null}">
+                    <strong th:text="${username}"></strong>님 환영합니다.
+                    <a href="/logout">로그아웃</a>
+                </span>
+
+                <span th:if="${username == null}">
+                    <a href="/login">로그인</a>
+                    <a href="/signup">회원가입</a>
+                </span>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="main">
+    <section class="card">
+        <span class="badge" th:text="${post.category}"></span>
+        <h2 class="card-title detail-title" th:text="${post.title}">게시글 제목</h2>
+
+        <div class="detail-meta">
+            <span>작성일: <strong th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></strong></span>
+
+            <span th:if="${post.updatedAt != null}">
+                수정일: <strong th:text="${#temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm')}"></strong>
+            </span>
+        </div>
+
+        <div class="detail-content" th:text="${post.content}">게시글 내용</div>
+
+        <div class="media-box" th:if="${mediaList.size() > 0}">
+            <h3 class="section-title">연결된 학습자료</h3>
+
+            <div th:each="media : ${mediaList}" class="media-item">
+                <div th:if="${media.mediaType == 'audio'}">
+                    <p class="media-file-name" th:text="${media.fileName}"></p>
+                    <audio controls>
+                        <source th:src="@{${media.filePath}}" th:type="${media.contentType}">
+                    </audio>
+                </div>
+
+                <div th:if="${media.mediaType == 'video'}">
+                    <p class="media-file-name" th:text="${media.fileName}"></p>
+                    <video controls>
+                        <source th:src="@{${media.filePath}}" th:type="${media.contentType}">
+                    </video>
+                </div>
+
+                <div th:if="${media.mediaType == 'document' or media.mediaType == 'html'}" class="file-download-card">
+                    <p class="media-file-name" th:text="${media.fileName}"></p>
+                    <p class="form-note">문서 파일은 재생 대신 다운로드 방식으로 제공합니다.</p>
+                    <div class="btn-area small-btn-area">
+                        <a class="btn btn-primary" th:href="@{/media-play/download/{id}(id=${media.mediaId})}">파일 다운로드</a>
+                        <a class="btn btn-gray" th:if="${media.contentType == 'application/pdf'}" th:href="@{${media.filePath}}" target="_blank">PDF 미리보기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-area">
+            <a class="btn btn-gray" href="/posts">목록</a>
+            <a class="btn btn-primary" th:href="@{/media-play/{id}(id=${post.postId})}" th:if="${mediaList.size() > 0}">자료 보기</a>
+
+            <span th:if="${loginUserId == post.userId}">
+                <a class="btn btn-green" th:href="@{/posts/{id}/edit(id=${post.postId})}">수정</a>
+            </span>
+
+            <form th:if="${loginUserId == post.userId}"
+                  th:action="@{/posts/{id}/delete(id=${post.postId})}"
+                  method="post"
+                  class="inline-form"
+                  onsubmit="return confirm('게시글을 삭제하시겠습니까?');">
+                <button class="btn btn-red" type="submit">삭제</button>
+            </form>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>
