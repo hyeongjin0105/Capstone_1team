@@ -18,7 +18,8 @@ import java.nio.charset.StandardCharsets
 @RequestMapping("/media-play")
 class MediaController(
     private val postService: PostService,
-    private val mediaService: MediaService
+    private val mediaService: MediaService,
+    private val geminiService: GeminiService
 ) {
     @GetMapping("/{postId}")
     fun mediaPlayPage(
@@ -37,6 +38,30 @@ class MediaController(
         model.addAttribute("mediaList", mediaList)
 
         return "media-play"
+    }
+
+    @PostMapping("/{mediaId}/generate-questions")
+    @ResponseBody
+    fun generateQuestions(@PathVariable mediaId: Long): ResponseEntity<String> {
+        return try {
+            val textContent = mediaService.getMediaContentAsText(mediaId)
+            val questions = geminiService.generateQuestions(textContent)
+            ResponseEntity.ok(questions)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e.message)
+        }
+    }
+
+    @PostMapping("/{mediaId}/summarize")
+    @ResponseBody
+    fun summarize(@PathVariable mediaId: Long): ResponseEntity<String> {
+        return try {
+            val textContent = mediaService.getMediaContentAsText(mediaId)
+            val summary = geminiService.summarize(textContent)
+            ResponseEntity.ok(summary)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e.message)
+        }
     }
 
     @GetMapping("/download/{mediaId}")

@@ -125,12 +125,31 @@ class MediaService(
         return resource
     }
 
+    fun getMediaContentAsText(mediaId: Long): String {
+        val media = getMedia(mediaId)
+            ?: throw IllegalArgumentException("존재하지 않는 미디어 ID입니다.")
+
+        return when (media.contentType) {
+            "text/plain", "text/markdown", "text/html" -> {
+                val resource = loadFileResource(media)
+                resource.inputStream.use { it.reader().readText() }
+            }
+            "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> {
+                throw IllegalArgumentException("PDF, DOCX 파일의 텍스트 추출은 아직 지원되지 않습니다.")
+            }
+            else -> {
+                throw IllegalArgumentException("텍스트를 추출할 수 있는 파일 형식이 아닙니다 (예: txt, md, html).")
+            }
+        }
+    }
+
     private fun deletePhysicalFile(media: Media) {
         val savedFileName = media.filePath.substringAfterLast("/")
 
         if (savedFileName.isBlank()) {
             return
         }
+
 
         val filePath = uploadDir.resolve(savedFileName).normalize()
 
