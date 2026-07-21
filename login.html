@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoSync - 로그인</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    
+    <style>
+        /* 기본 여백 초기화 및 폰트 설정 */
+        * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        
+        /* 화면 전체 배경 (아주 옅은 블루그레이로 세련된 느낌) */
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #1e293b;
+        }
+
+        /* 로그인 폼이 들어갈 하얀색 카드 영역 */
+        .auth-card {
+            background: white;
+            padding: 3rem 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* 로고 및 타이틀 영역 */
+        .auth-logo-wrap {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .logo-icon {
+            font-size: 2rem;
+            color: #0ca678; /* 포인트 컬러: 테알(Teal) */
+            margin-bottom: 0.5rem;
+        }
+        .auth-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            color: #0f172a; /* 메인 컬러: 네이비 */
+            letter-spacing: -0.5px;
+        }
+        .auth-sub {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 2.5rem;
+        }
+
+        /* 입력 폼 디자인 */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #475569;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        
+        /* 입력창 클릭 시 테두리 색상 변경 (테알) */
+        .form-group input:focus {
+            outline: none;
+            border-color: #0ca678;
+            box-shadow: 0 0 0 3px rgba(12, 166, 120, 0.1);
+        }
+
+        /* 로그인 버튼 디자인 (네이비) */
+        .btn-primary {
+            width: 100%;
+            padding: 0.9rem;
+            background-color: #0f172a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+        .btn-primary:hover {
+            background-color: #1e293b;
+        }
+
+        /* 에러 메시지 */
+        .error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        /* 회원가입 링크 */
+        .auth-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        .auth-link a {
+            color: #0ca678; /* 포인트 컬러: 테알(Teal) */
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="auth-page">
+
+<div class="auth-card">
+    <div class="auth-logo-wrap">
+        <div class="logo-icon">✨</div>
+        <h1 class="auth-title">LingoSync</h1>
+    </div>
+    <p class="auth-sub">AI 기반 글로벌 학습 지원 플랫폼</p>
+
+    <form action="/login" method="post">
+        <div class="form-group">
+            <label>이메일</label>
+            <input type="email" name="email" placeholder="user@example.com" required>
+        </div>
+
+        <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" name="password" placeholder="비밀번호를 입력하세요" required>
+        </div>
+
+        <button class="btn btn-primary full-btn" type="submit">로그인</button>
+    </form>
+
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+
+    <div class="auth-link">
+        계정이 없으신가요? <a href="/signup">회원가입</a>
+    </div>
+</div>
+
+</body>
+</html>

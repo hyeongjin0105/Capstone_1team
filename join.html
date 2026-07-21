@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoSync - 회원가입</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+
+    <style>
+        /* 기본 여백 초기화 및 폰트 설정 */
+        * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+
+        /* 화면 전체 배경 (로그인과 동일) */
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #1e293b;
+            padding: 2rem 1rem;
+        }
+
+        /* 회원가입 카드 영역 */
+        .auth-card {
+            background: white;
+            padding: 2.5rem 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* 로고 및 타이틀 영역 */
+        .auth-logo-wrap {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .logo-icon {
+            font-size: 2rem;
+            color: #0ca678;
+            margin-bottom: 0.5rem;
+        }
+        .auth-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+        .auth-sub {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        /* 입력 폼 디자인 */
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #475569;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        /* 입력창 포커스 (테알) */
+        .form-group input:focus {
+            outline: none;
+            border-color: #0ca678;
+            box-shadow: 0 0 0 3px rgba(12, 166, 120, 0.1);
+        }
+
+        /* 인풋 하단 힌트 텍스트 */
+        .form-hint {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.35rem;
+            font-weight: 500;
+        }
+        .form-hint.error {
+            color: #ef4444;
+        }
+        .form-hint.success {
+            color: #0ca678;
+        }
+
+        /* 약관 동의 체크박스 */
+        .terms-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            margin: 1.25rem 0 0.5rem 0;
+            font-size: 0.85rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+        .terms-group input[type="checkbox"] {
+            margin-top: 3px;
+            width: 16px;
+            height: 16px;
+            accent-color: #0ca678;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .terms-group a {
+            color: #0ca678;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .terms-group a:hover {
+            text-decoration: underline;
+        }
+
+        /* 회원가입 버튼 (네이비) */
+        .btn-primary {
+            width: 100%;
+            padding: 0.9rem;
+            background-color: #0f172a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1.2rem;
+        }
+        .btn-primary:hover {
+            background-color: #1e293b;
+        }
+
+        /* 서버 에러 메시지 (전역) */
+        .error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        /* 로그인 링크 */
+        .auth-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        .auth-link a {
+            color: #0ca678;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="auth-page">
+
+<div class="auth-card">
+    <div class="auth-logo-wrap">
+        <div class="logo-icon">✨</div>
+        <h1 class="auth-title">회원가입</h1>
+    </div>
+    <p class="auth-sub">LingoSync와 함께 학습을 시작해보세요</p>
+
+    <form action="/signup" method="post">
+        <div class="form-group">
+            <label>이름</label>
+            <input type="text" name="username" placeholder="홍길동" required>
+        </div>
+
+        <div class="form-group">
+            <label>이메일</label>
+            <input type="email" name="email" placeholder="user@example.com" required>
+            <p class="form-hint">로그인 시 사용됩니다</p>
+        </div>
+
+        <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" name="password" placeholder="8자 이상, 영문+숫자" required minlength="8">
+        </div>
+
+        <div class="form-group">
+            <label>비밀번호 확인</label>
+            <input type="password" name="passwordConfirm" placeholder="비밀번호를 다시 입력하세요" required minlength="8">
+        </div>
+
+        <div class="terms-group">
+            <input type="checkbox" id="terms" name="terms" required>
+            <label for="terms" style="margin: 0; font-weight: 500; cursor: pointer;">
+                <a href="/terms">이용약관</a> 및 <a href="/privacy">개인정보처리방침</a>에 동의합니다
+            </label>
+        </div>
+
+        <button class="btn btn-primary full-btn" type="submit">회원가입</button>
+    </form>
+
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+
+    <div class="auth-link">
+        이미 계정이 있으신가요? <a href="/login">로그인</a>
+    </div>
+</div>
+
+</body>
+</html>
