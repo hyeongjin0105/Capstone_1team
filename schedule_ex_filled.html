@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoSync - 스케줄</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        body { margin: 0; padding: 0; display: flex; height: 100vh; background-color: #eef2f8; color: #1e293b; }
+
+        /* SIDEBAR */
+        .sidebar { width: 250px; background-color: #0f172a; display: flex; flex-direction: column; padding: 1.5rem; flex-shrink: 0; }
+        .logo-wrap { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 2.5rem; }
+        .logo-icon { font-size: 1.5rem; color: #0ca678; }
+        .logo { margin: 0; font-size: 1.4rem; font-weight: 800; color: white; letter-spacing: -0.5px; }
+        .nav-menu { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+        .nav-menu a { color: #cbd5e1; text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 0.8rem 1rem; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .nav-menu a:hover, .nav-menu a.active { background-color: #1e293b; color: #0ca678; font-weight: 600; }
+        .user-profile { background-color: #1e293b; padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 12px; margin-top: auto; }
+        .profile-pic { width: 36px; height: 36px; background:#334155; border-radius: 50%; display:flex; justify-content:center; align-items:center; font-size: 1.2rem; }
+        .user-info p { margin: 0; font-size: 0.9rem; font-weight: 600; color: white; }
+        .user-info span { font-size: 0.75rem; color: #10b981; font-weight: 600; }
+
+        /* MAIN */
+        .main-content { flex: 1; padding: 2.5rem; overflow-y: auto; display: flex; flex-direction: column; }
+        .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .page-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #0f172a; }
+        .page-header p { margin: 0.3rem 0 0 0; font-size: 0.9rem; color: #64748b; }
+        .add-btn { background-color: #0ca678; color: white; border: none; padding: 0.8rem 1.3rem; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
+        .add-btn:hover { background-color: #098c65; }
+
+        /* SUMMARY ROW */
+        .summary-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; border: 1px solid #dce4ee; border-radius: 14px; padding: 1.3rem 1.5rem; box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
+        .stat-card .num { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin: 0; }
+        .stat-card .label { font-size: 0.8rem; color: #64748b; font-weight: 600; margin: 0.3rem 0 0 0; }
+        .stat-card.red .num { color: #ef4444; }
+        .stat-card.yellow .num { color: #eab308; }
+
+        /* TOOLBAR */
+        .toolbar { display: flex; gap: 0.8rem; margin-bottom: 1.5rem; align-items: center; }
+        .filter-select { padding: 0.7rem 1rem; background: white; color: #0f172a; border: 1px solid #dce4ee; border-radius: 8px; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .tab-group { display: flex; gap: 0.5rem; margin-left: auto; }
+        .tab { padding: 0.6rem 1rem; border: 1px solid #dce4ee; background: white; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #64748b; cursor: pointer; }
+        .tab.active { background: #0f172a; color: white; border-color: #0f172a; }
+
+        /* SCHEDULE LIST */
+        .schedule-panel { background: white; border: 1px solid #dce4ee; border-radius: 16px; box-shadow: 0 10px 30px rgba(15,23,42,0.06); padding: 0.5rem; }
+        .schedule-item { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.3rem; border-left: 4px solid #ef4444; border-radius: 8px; margin: 0.5rem; background: white; transition: background 0.15s; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+        .schedule-item:hover { background: #f4f7fb; }
+        .schedule-item.yellow { border-left-color: #eab308; }
+        .schedule-item.green { border-left-color: #10b981; }
+        .check { width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 6px; flex-shrink: 0; cursor: pointer; }
+        .item-body { flex: 1; }
+        .item-body .title { margin: 0; font-size: 0.95rem; font-weight: 700; color: #0f172a; }
+        .item-body .sub { margin: 0.25rem 0 0 0; font-size: 0.8rem; color: #94a3b8; font-weight: 500; }
+        .priority-badge { font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+        .priority-badge.high { background: #fef2f2; color: #ef4444; }
+        .priority-badge.mid { background: #fefce8; color: #ca8a04; }
+        .priority-badge.low { background: #ecfdf5; color: #0ca678; }
+        .deadline { font-size: 0.82rem; font-weight: 700; color: #475569; min-width: 90px; text-align: right; }
+        .deadline .dday { color: #ef4444; }
+        .deadline.safe .dday { color: #64748b; }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <a class="logo-wrap" href="/posts">
+        <div class="logo-icon">✨</div>
+        <h1 class="logo">LingoSync</h1>
+    </a>
+    <nav class="nav-menu">
+        <a href="#">🎛️ Dashboard</a>
+        <a href="#">📚 Lectures</a>
+        <a href="#" class="active">📅 Schedule</a>
+        <a href="#">📝 Quizzes</a>
+    </nav>
+    <div class="user-profile">
+        <div class="profile-pic">😎</div>
+        <div class="user-info">
+            <p>user</p>
+            <span>● Online</span>
+        </div>
+    </div>
+</aside>
+
+<main class="main-content">
+    <div class="page-header">
+        <div>
+            <h2>통합 학업 스케줄</h2>
+            <p>과제와 시험을 우선순위별로 관리하세요</p>
+        </div>
+        <button class="add-btn">＋ 새 일정 추가</button>
+    </div>
+
+    <!-- 요약 통계 -->
+    <div class="summary-row">
+        <div class="stat-card red">
+            <p class="num">2</p>
+            <p class="label">마감 임박 (D-3 이내)</p>
+        </div>
+        <div class="stat-card yellow">
+            <p class="num">3</p>
+            <p class="label">이번 주 예정</p>
+        </div>
+        <div class="stat-card">
+            <p class="num">6</p>
+            <p class="label">전체 일정</p>
+        </div>
+    </div>
+
+    <!-- 필터 + 탭 -->
+    <div class="toolbar">
+        <select class="filter-select">
+            <option>정렬: 마감일순</option>
+            <option>정렬: 중요도순</option>
+        </select>
+        <select class="filter-select">
+            <option>전체 과목</option>
+            <option>Computer Science</option>
+            <option>Engineering</option>
+        </select>
+        <div class="tab-group">
+            <div class="tab active">전체</div>
+            <div class="tab">과제</div>
+            <div class="tab">시험</div>
+        </div>
+    </div>
+
+    <!-- 일정 리스트 -->
+    <div class="schedule-panel">
+
+        <div class="schedule-item">
+            <div class="check"></div>
+            <div class="item-body">
+                <p class="title">캡스톤 중간 발표자료 제출</p>
+                <p class="sub">Computer Science · 과제</p>
+            </div>
+            <span class="priority-badge high">중요도 상</span>
+            <div class="deadline"><span class="dday">D-1</span><br>내일</div>
+        </div>
+
+        <div class="schedule-item">
+            <div class="check"></div>
+            <div class="item-body">
+                <p class="title">LingoSync UI 시안 초안</p>
+                <p class="sub">Capstone · 과제</p>
+            </div>
+            <span class="priority-badge high">중요도 상</span>
+            <div class="deadline"><span class="dday">D-3</span><br>금요일</div>
+        </div>
+
+        <div class="schedule-item yellow">
+            <div class="check"></div>
+            <div class="item-body">
+                <p class="title">데이터베이스 정규화 과제</p>
+                <p class="sub">Computer Science · 과제</p>
+            </div>
+            <span class="priority-badge mid">중요도 중</span>
+            <div class="deadline safe"><span class="dday">D-5</span><br>일요일</div>
+        </div>
+
+        <div class="schedule-item yellow">
+            <div class="check"></div>
+            <div class="item-body">
+                <p class="title">알고리즘 중간고사</p>
+                <p class="sub">Computer Science · 시험</p>
+            </div>
+            <span class="priority-badge mid">중요도 중</span>
+            <div class="deadline safe"><span class="dday">D-7</span><br>화요일</div>
+        </div>
+
+        <div class="schedule-item green">
+            <div class="check"></div>
+            <div class="item-body">
+                <p class="title">영어 스피킹 발표 준비</p>
+                <p class="sub">English · 과제</p>
+            </div>
+            <span class="priority-badge low">중요도 하</span>
+            <div class="deadline safe"><span class="dday">D-10</span><br>다음주 금</div>
+        </div>
+
+        <div class="schedule-item green">
+            <div class="check"></div>
+            <div class="item-body">
+                <p class="title">MATLAB 실습 보고서</p>
+                <p class="sub">Engineering · 과제</p>
+            </div>
+            <span class="priority-badge low">중요도 하</span>
+            <div class="deadline safe"><span class="dday">D-12</span><br>다음주 일</div>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

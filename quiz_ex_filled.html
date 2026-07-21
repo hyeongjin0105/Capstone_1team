@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoSync - 퀴즈</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        body { margin: 0; padding: 0; display: flex; height: 100vh; background-color: #eef2f8; color: #1e293b; }
+
+        .sidebar { width: 250px; background-color: #0f172a; display: flex; flex-direction: column; padding: 1.5rem; flex-shrink: 0; }
+        .logo-wrap { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 2.5rem; }
+        .logo-icon { font-size: 1.5rem; color: #0ca678; }
+        .logo { margin: 0; font-size: 1.4rem; font-weight: 800; color: white; letter-spacing: -0.5px; }
+        .nav-menu { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+        .nav-menu a { color: #cbd5e1; text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 0.8rem 1rem; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .nav-menu a:hover, .nav-menu a.active { background-color: #1e293b; color: #0ca678; font-weight: 600; }
+        .user-profile { background-color: #1e293b; padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 12px; margin-top: auto; }
+        .profile-pic { width: 36px; height: 36px; background:#334155; border-radius: 50%; display:flex; justify-content:center; align-items:center; font-size: 1.2rem; }
+        .user-info p { margin: 0; font-size: 0.9rem; font-weight: 600; color: white; }
+        .user-info span { font-size: 0.75rem; color: #10b981; font-weight: 600; }
+
+        .main-content { flex: 1; padding: 2.5rem; overflow-y: auto; display: flex; flex-direction: column; }
+        .page-header { margin-bottom: 2rem; }
+        .page-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #0f172a; }
+        .page-header p { margin: 0.3rem 0 0 0; font-size: 0.9rem; color: #64748b; }
+
+        /* 강의 선택 드롭다운 */
+        .quiz-toolbar { display: flex; gap: 0.8rem; align-items: center; margin-bottom: 2rem; }
+        .filter-select { padding: 0.7rem 1rem; background: white; color: #0f172a; border: 1px solid #dce4ee; border-radius: 8px; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; min-width: 260px; }
+        .quiz-meta { font-size: 0.85rem; color: #64748b; font-weight: 600; margin-left: auto; }
+
+        /* 카드 영역 */
+        .quiz-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+
+        /* 진행 바 */
+        .progress-wrap { width: 100%; max-width: 640px; margin-bottom: 1.5rem; }
+        .progress-top { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem; }
+        .progress-bar { height: 8px; background: #dce4ee; border-radius: 999px; overflow: hidden; }
+        .progress-fill { width: 60%; height: 100%; background: #0ca678; border-radius: 999px; }
+
+        /* 플래시카드 */
+        .flashcard { width: 100%; max-width: 640px; min-height: 320px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 2.5rem; color: white; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(15,23,42,0.25); }
+        .flashcard::before { content: ''; position: absolute; top: -40px; right: -40px; width: 160px; height: 160px; background: rgba(12,166,120,0.15); border-radius: 50%; }
+        .flashcard::after { content: ''; position: absolute; bottom: -50px; left: -30px; width: 120px; height: 120px; background: rgba(59,130,246,0.1); border-radius: 50%; }
+        .card-tag { font-size: 0.72rem; font-weight: 700; color: #0ca678; letter-spacing: 1.5px; position: relative; margin-bottom: 1.5rem; }
+        .card-question { font-size: 1.4rem; font-weight: 700; line-height: 1.5; position: relative; flex: 1; }
+        .card-hint { font-size: 0.85rem; color: #94a3b8; position: relative; margin-top: 1.5rem; display: flex; align-items: center; gap: 6px; }
+
+        /* 정답 영역 (펼쳐진 상태) */
+        .answer-box { width: 100%; max-width: 640px; background: white; border: 1px solid #dce4ee; border-left: 4px solid #0ca678; border-radius: 12px; padding: 1.5rem; margin-top: 1.2rem; box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
+        .answer-label { font-size: 0.72rem; font-weight: 700; color: #0ca678; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .answer-text { font-size: 0.95rem; color: #334155; line-height: 1.6; margin: 0; }
+
+        /* 컨트롤 버튼 */
+        .controls { display: flex; gap: 1rem; margin-top: 1.5rem; width: 100%; max-width: 640px; }
+        .ctrl-btn { flex: 1; padding: 0.9rem; border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: inherit; border: 1px solid #dce4ee; background: white; color: #475569; transition: all 0.15s; }
+        .ctrl-btn:hover { background: #f4f7fb; }
+        .ctrl-btn.primary { background: #0ca678; color: white; border-color: #0ca678; }
+        .ctrl-btn.primary:hover { background: #098c65; }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <a class="logo-wrap" href="/posts">
+        <div class="logo-icon">✨</div>
+        <h1 class="logo">LingoSync</h1>
+    </a>
+    <nav class="nav-menu">
+        <a href="#">🎛️ Dashboard</a>
+        <a href="#">📚 Lectures</a>
+        <a href="#">📅 Schedule</a>
+        <a href="#" class="active">📝 Quizzes</a>
+    </nav>
+    <div class="user-profile">
+        <div class="profile-pic">😎</div>
+        <div class="user-info">
+            <p>user</p>
+            <span>● Online</span>
+        </div>
+    </div>
+</aside>
+
+<main class="main-content">
+    <div class="page-header">
+        <h2>퀴즈 복습</h2>
+        <p>AI가 생성한 플래시카드로 강의 내용을 복습하세요</p>
+    </div>
+
+    <div class="quiz-toolbar">
+        <select class="filter-select">
+            <option>Introduction to Machine Learning</option>
+            <option>Discrete-Time Signals and Systems</option>
+            <option>Time Complexity &amp; Big-O Notation</option>
+        </select>
+        <span class="quiz-meta">정답률 80% · 마지막 복습 2일 전</span>
+    </div>
+
+    <div class="quiz-stage">
+
+        <div class="progress-wrap">
+            <div class="progress-top">
+                <span>진행률</span>
+                <span>3 / 5</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+        </div>
+
+        <div class="flashcard">
+            <div class="card-tag">QUESTION 3</div>
+            <div class="card-question">
+                Which type of machine learning uses <b>only input data</b> and finds hidden structure, such as clustering?
+            </div>
+            <div class="card-hint">💡 정답을 생각한 뒤 아래 버튼을 눌러 확인하세요</div>
+        </div>
+
+        <div class="answer-box">
+            <div class="answer-label">ANSWER</div>
+            <p class="answer-text"><b>Unsupervised Learning (비지도 학습)</b> — 정답 레이블 없이 입력 데이터만으로 군집화(clustering)나 패턴을 찾아내는 학습 방식입니다.</p>
+        </div>
+
+        <div class="controls">
+            <button class="ctrl-btn">◀ 이전</button>
+            <button class="ctrl-btn primary">다음 ▶</button>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

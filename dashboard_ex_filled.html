@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoSync - 강의 학습 대시보드</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+
+    <style>
+        * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+
+        body {
+            margin: 0; padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f7f9;
+            color: #1e293b;
+        }
+
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            width: 250px;
+            background-color: #0f172a;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            flex-shrink: 0;
+        }
+        .logo-wrap {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; margin-bottom: 2.5rem;
+        }
+        .logo-icon { font-size: 1.5rem; color: #0ca678; }
+        .logo { margin: 0; font-size: 1.4rem; font-weight: 800; color: white; letter-spacing: -0.5px; }
+
+        .nav-menu { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+        .nav-menu a {
+            color: #cbd5e1; text-decoration: none; font-weight: 500; font-size: 0.95rem;
+            padding: 0.8rem 1rem; border-radius: 8px; transition: all 0.2s;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .nav-menu a:hover, .nav-menu a.active {
+            background-color: #1e293b; color: #0ca678; font-weight: 600;
+        }
+
+        .user-profile {
+            background-color: #1e293b; padding: 1rem; border-radius: 12px;
+            display: flex; align-items: center; gap: 12px; margin-top: auto;
+        }
+        .profile-pic {
+            width: 36px; height: 36px; background:#334155;
+            border-radius: 50%; display:flex; justify-content:center; align-items:center;
+            font-size: 1.2rem;
+        }
+        .user-info p { margin: 0; font-size: 0.9rem; font-weight: 600; color: white; }
+        .user-info span { font-size: 0.75rem; color: #10b981; font-weight: 600; }
+
+        /* ============ MAIN ============ */
+        .main-content {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .page-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #0f172a; }
+        .header-meta { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 300px;
+            gap: 1.5rem;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+            min-height: 0;
+        }
+        .card-title {
+            font-size: 1.1rem; font-weight: 700; color: #0f172a; margin: 0 0 1rem 0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .card-title .badge {
+            font-size: 0.7rem; font-weight: 700; color: #0ca678;
+            background: #ecfdf5; padding: 3px 8px; border-radius: 999px;
+        }
+
+        /* ============ INPUT CARD ============ */
+        .input-card { }
+        .input-card .text-area {
+            flex: 1; background-color: #f8fafc; border-radius: 8px;
+            border: 1px solid #e2e8f0; padding: 0; min-height: 0;
+        }
+        .input-card textarea {
+            width: 100%; height: 100%; border: none; background: transparent;
+            padding: 1rem; resize: none; font-family: inherit; font-size: 0.9rem;
+            color: #334155; line-height: 1.6; outline: none;
+        }
+        .input-meta {
+            display: flex; justify-content: space-between; font-size: 0.75rem;
+            color: #94a3b8; margin-top: 0.6rem; font-weight: 500;
+        }
+        .generate-btn {
+            width: 100%; padding: 1rem; margin-top: 1rem;
+            background-color: #0ca678; color: white; border: none; border-radius: 8px;
+            font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s;
+        }
+        .generate-btn:hover { background-color: #098c65; }
+
+        /* ============ SUMMARY CARD ============ */
+        .summary-card .summary-body {
+            flex: 1; overflow-y: auto; padding-right: 4px;
+        }
+        .summary-section { margin-bottom: 1.2rem; }
+        .summary-section:last-child { margin-bottom: 0; }
+        .summary-section h4 {
+            margin: 0 0 0.5rem 0; font-size: 0.8rem; font-weight: 700;
+            color: #0ca678; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .summary-section ul {
+            margin: 0; padding-left: 1.1rem; color: #334155;
+            font-size: 0.9rem; line-height: 1.65;
+        }
+        .summary-section li { margin-bottom: 0.35rem; }
+        .keyword {
+            display: inline-block; background: #f1f5f9; color: #0f172a;
+            padding: 1px 6px; border-radius: 4px; font-weight: 600; font-size: 0.85rem;
+        }
+
+        /* ============ RIGHT WIDGETS ============ */
+        .right-widgets { display: flex; flex-direction: column; gap: 1.5rem; min-height: 0; }
+
+        /* Flashcard */
+        .flashcard-card { flex: 0.9; }
+        .flashcard {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 12px; padding: 1.2rem 1rem;
+            flex: 1; display: flex; flex-direction: column; justify-content: space-between;
+            color: white; position: relative; overflow: hidden;
+        }
+        .flashcard::before {
+            content: ''; position: absolute; top: -30px; right: -30px;
+            width: 100px; height: 100px; background: rgba(12, 166, 120, 0.15);
+            border-radius: 50%;
+        }
+        .flashcard-tag {
+            font-size: 0.65rem; font-weight: 700; color: #0ca678;
+            letter-spacing: 1px; margin-bottom: 0.5rem; position: relative;
+        }
+        .flashcard-q {
+            font-size: 0.95rem; font-weight: 600; line-height: 1.5;
+            position: relative; margin: 0.3rem 0;
+        }
+        .flashcard-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 0.8rem; position: relative;
+        }
+        .flip-btn {
+            background: rgba(255,255,255,0.1); color: white;
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;
+            padding: 6px 10px; font-size: 0.75rem; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+        }
+        .flip-btn:hover { background: rgba(255,255,255,0.18); }
+        .card-counter { font-size: 0.7rem; color: #94a3b8; font-weight: 600; }
+
+        /* Schedule */
+        .schedule-card { flex: 1.3; min-height: 0; }
+        select {
+            width: 100%; padding: 0.6rem 0.8rem; margin-bottom: 0.8rem;
+            background: #f8fafc; color: #0f172a; border: 1px solid #e2e8f0;
+            border-radius: 8px; font-family: inherit; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer;
+        }
+        .schedule-list {
+            display: flex; flex-direction: column; overflow-y: auto;
+            padding-right: 4px; flex: 1; min-height: 0;
+        }
+        .schedule-item {
+            background: white; padding: 10px 12px; border-radius: 8px;
+            border-left: 4px solid #ef4444;
+            border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 8px; cursor: pointer; transition: transform 0.15s;
+        }
+        .schedule-item:hover { transform: translateX(2px); }
+        .schedule-item.yellow { border-left-color: #eab308; }
+        .schedule-item.green  { border-left-color: #10b981; }
+        .schedule-item p {
+            margin: 0 0 4px 0; font-size: 0.85rem; font-weight: 700; color: #0f172a;
+        }
+        .schedule-item .meta {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.7rem; font-weight: 600;
+        }
+        .priority-red    { color: #ef4444; }
+        .priority-yellow { color: #eab308; }
+        .priority-green  { color: #10b981; }
+        .deadline { color: #64748b; }
+    </style>
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+    <a class="logo-wrap" href="/posts">
+        <div class="logo-icon">✨</div>
+        <h1 class="logo">LingoSync</h1>
+    </a>
+
+    <nav class="nav-menu">
+        <a href="#" class="active">🎛️ Dashboard</a>
+        <a href="#">📚 Lectures</a>
+        <a href="#">📅 Schedule</a>
+        <a href="#">📝 Quizzes</a>
+    </nav>
+
+    <div class="user-profile">
+        <div class="profile-pic">😎</div>
+        <div class="user-info">
+            <p>user</p>
+            <span>● Online</span>
+        </div>
+    </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<main class="main-content">
+    <div class="page-header">
+        <h2>강의 학습 대시보드: Machine Learning Intro</h2>
+        <span class="header-meta">Last analyzed: 2 mins ago</span>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <!-- 1) INPUT -->
+        <div class="card input-card">
+            <h3 class="card-title">
+                English Script (Input)
+                <span class="badge">1,248 words</span>
+            </h3>
+            <div class="text-area">
+<textarea>Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed. It focuses on developing computer programs that can access data and use it to learn for themselves.
+
+The learning process begins with observations or data, such as examples, direct experience, or instruction. The primary aim is to allow the computers to learn automatically without human intervention and adjust actions accordingly.
+
+Supervised learning algorithms build a mathematical model of a set of data that contains both the inputs and the desired outputs. Unsupervised learning algorithms take a set of data that contains only inputs, and find structure in the data, like grouping or clustering of data points.
+
+Reinforcement learning is an area of machine learning concerned with how software agents ought to take actions in an environment in order to maximize the notion of cumulative reward...</textarea>
+            </div>
+            <div class="input-meta">
+                <span>English (US)</span>
+                <span>Est. read time: 6 min</span>
+            </div>
+            <button class="generate-btn">🤖 AI 요약 & 문제 다시 생성</button>
+        </div>
+
+        <!-- 2) SUMMARY -->
+        <div class="card summary-card">
+            <h3 class="card-title">
+                AI Summary (Output)
+                <span class="badge">한국어</span>
+            </h3>
+            <div class="summary-body">
+
+                <div class="summary-section">
+                    <h4>📌 핵심 개념</h4>
+                    <ul>
+                        <li><span class="keyword">머신러닝(ML)</span>은 인공지능의 하위 분야로, 시스템이 명시적 프로그래밍 없이 <b>경험을 통해 스스로 학습</b>하고 개선하는 기술이다.</li>
+                        <li>학습은 예시, 직접 경험, 지시 등의 <b>데이터/관측값</b>으로부터 시작된다.</li>
+                    </ul>
+                </div>
+
+                <div class="summary-section">
+                    <h4>⚙️ 3가지 학습 방식</h4>
+                    <ul>
+                        <li><span class="keyword">Supervised</span> — 입력값과 정답(desired output)을 함께 학습하는 방식.</li>
+                        <li><span class="keyword">Unsupervised</span> — 입력값만 주어지고, 데이터 안의 <b>구조나 패턴(clustering)</b>을 찾는 방식.</li>
+                        <li><span class="keyword">Reinforcement</span> — 에이전트가 환경에서 행동하며 <b>누적 보상</b>을 최대화하도록 학습.</li>
+                    </ul>
+                </div>
+
+                <div class="summary-section">
+                    <h4>💡 시험 포인트</h4>
+                    <ul>
+                        <li>세 학습 방식의 <b>입력/출력 데이터 차이</b>는 자주 출제됨.</li>
+                        <li>“cumulative reward”라는 표현은 강화학습을 지목하는 결정적 키워드.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3) RIGHT WIDGETS -->
+        <div class="right-widgets">
+
+            <!-- Flashcard -->
+            <div class="card flashcard-card">
+                <h3 class="card-title">
+                    AI 퀴즈 플래시카드
+                    <span class="badge">3 / 5</span>
+                </h3>
+                <div class="flashcard">
+                    <div>
+                        <div class="flashcard-tag">QUESTION</div>
+                        <p class="flashcard-q">
+                            Which type of learning uses <b>only inputs</b> and finds hidden structure like clustering?
+                        </p>
+                    </div>
+                    <div class="flashcard-controls">
+                        <button class="flip-btn">◀ Prev</button>
+                        <span class="card-counter">Tap to reveal</span>
+                        <button class="flip-btn">Next ▶</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule -->
+            <div class="card schedule-card">
+                <h3 class="card-title">통합 학업 스케줄</h3>
+                <select>
+                    <option>정렬 기준: 마감일순</option>
+                    <option>정렬 기준: 중요도순</option>
+                </select>
+
+                <div class="schedule-list">
+                    <div class="schedule-item">
+                        <p>캡스톤 중간 발표자료 제출</p>
+                        <div class="meta">
+                            <span class="priority-red">● 중요도 상</span>
+                            <span class="deadline">D-1 · 내일</span>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <p>LingoSync UI 시안 초안</p>
+                        <div class="meta">
+                            <span class="priority-red">● 중요도 상</span>
+                            <span class="deadline">D-3 · 금</span>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item yellow">
+                        <p>데이터베이스 정규화 과제</p>
+                        <div class="meta">
+                            <span class="priority-yellow">● 중요도 중</span>
+                            <span class="deadline">D-5 · 일</span>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item yellow">
+                        <p>알고리즘 Chapter 3 문제풀이</p>
+                        <div class="meta">
+                            <span class="priority-yellow">● 중요도 중</span>
+                            <span class="deadline">D-7 · 화</span>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item green">
+                        <p>영어 스피킹 발표 준비</p>
+                        <div class="meta">
+                            <span class="priority-green">● 중요도 하</span>
+                            <span class="deadline">D-10 · 금</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

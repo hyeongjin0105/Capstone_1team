@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoSync - 퀴즈</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        body { margin: 0; padding: 0; display: flex; height: 100vh; background-color: #eef2f8; color: #1e293b; }
+
+        .sidebar { width: 250px; background-color: #0f172a; display: flex; flex-direction: column; padding: 1.5rem; flex-shrink: 0; }
+        .logo-wrap { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 2.5rem; }
+        .logo-icon { font-size: 1.5rem; color: #0ca678; }
+        .logo { margin: 0; font-size: 1.4rem; font-weight: 800; color: white; letter-spacing: -0.5px; }
+        .nav-menu { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+        .nav-menu a { color: #cbd5e1; text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 0.8rem 1rem; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .nav-menu a:hover, .nav-menu a.active { background-color: #1e293b; color: #0ca678; font-weight: 600; }
+        .user-profile { background-color: #1e293b; padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 12px; margin-top: auto; }
+        .profile-pic { width: 36px; height: 36px; background:#334155; border-radius: 50%; display:flex; justify-content:center; align-items:center; font-size: 1.2rem; }
+        .user-info p { margin: 0; font-size: 0.9rem; font-weight: 600; color: white; }
+        .user-info span { font-size: 0.75rem; color: #10b981; font-weight: 600; }
+
+        .main-content { flex: 1; padding: 2.5rem; overflow-y: auto; display: flex; flex-direction: column; }
+        .page-header { margin-bottom: 2rem; }
+        .page-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #0f172a; }
+        .page-header p { margin: 0.3rem 0 0 0; font-size: 0.9rem; color: #64748b; }
+
+        .empty-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .empty-card { background: white; border: 1px solid #dce4ee; border-radius: 16px; box-shadow: 0 10px 30px rgba(15,23,42,0.06); padding: 3.5rem 3rem; max-width: 440px; display: flex; flex-direction: column; align-items: center; }
+        .empty-icon { font-size: 3rem; margin-bottom: 1.2rem; opacity: 0.6; }
+        .empty-card h3 { margin: 0 0 0.6rem 0; font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+        .empty-card p { margin: 0 0 1.8rem 0; font-size: 0.9rem; color: #64748b; line-height: 1.6; }
+        .empty-btn { background-color: #0ca678; color: white; border: none; padding: 0.9rem 1.6rem; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+        .empty-btn:hover { background-color: #098c65; }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <a class="logo-wrap" href="/posts">
+        <div class="logo-icon">✨</div>
+        <h1 class="logo">LingoSync</h1>
+    </a>
+    <nav class="nav-menu">
+        <a href="#">🎛️ Dashboard</a>
+        <a href="#">📚 Lectures</a>
+        <a href="#">📅 Schedule</a>
+        <a href="#" class="active">📝 Quizzes</a>
+    </nav>
+    <div class="user-profile">
+        <div class="profile-pic">😎</div>
+        <div class="user-info">
+            <p>user</p>
+            <span>● Online</span>
+        </div>
+    </div>
+</aside>
+
+<main class="main-content">
+    <div class="page-header">
+        <h2>퀴즈 복습</h2>
+        <p>AI가 생성한 플래시카드로 강의 내용을 복습하세요</p>
+    </div>
+
+    <div class="empty-wrap">
+        <div class="empty-card">
+            <div class="empty-icon">📝</div>
+            <h3>아직 퀴즈가 없습니다</h3>
+            <p>강의 스크립트를 분석하면<br>AI가 복습용 플래시카드를 자동으로 만들어줍니다.</p>
+            <button class="empty-btn">🤖 강의 분석하러 가기</button>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>
